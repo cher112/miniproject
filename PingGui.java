@@ -96,7 +96,7 @@ public class PingGui {
 				FileOutputStream file1 = new FileOutputStream(f);
 				PrintStream print2 = new PrintStream(file1);
 				System.setOut(print2);
-				System.out.println(UrlString+"-"+ft.format(dNow)+".doc");
+				System.out.println(UrlString+"-"+ft.format(dNow)+".txt");
 				System.out.println();
 				System.out.println("RTT(ms) histogram"); 
 
