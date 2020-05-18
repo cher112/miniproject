@@ -10,6 +10,8 @@ import java.util.Scanner;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Color;
+import java.awt.SystemColor;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.JLabel;
@@ -34,11 +36,6 @@ public class PingGui {
 		new PingGui();
 } 
 
-	/**
-	 * Create the application.
-	 * 
-	 * 
-	 */
 	public PingGui() throws IOException {
 		initialize();
 	}
@@ -62,11 +59,19 @@ public class PingGui {
     	System.setOut (new PrintStream (out));
 		frmPingtest.getContentPane().add(textArea);
 
+		JTextArea textArea2 = new JTextArea();
+		textArea2.setBackground(SystemColor.control);
+		textArea2.setBounds(760, 69, 214, 143);
+		textArea2.setEditable(false);
+		textArea2.setText("Your output will appear hear");
+		frmPingtest.getContentPane().add(textArea2);
 
 		textField = new JTextField();
 		textField.setBounds(114, 72, 214, 19);
 		frmPingtest.getContentPane().add(textField);
 		textField.setColumns(10);
+
+
 
 		JSpinner Probespinner = new JSpinner();
 		Probespinner.setModel(new SpinnerNumberModel(1, 1, 10, 1));
@@ -133,6 +138,7 @@ public class PingGui {
 		frmPingtest.getContentPane().add(HisLabel);
 
 		frmPingtest.setVisible(true);
+
 	}
 }
 
