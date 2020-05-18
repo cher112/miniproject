@@ -6,6 +6,9 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 
 import java.util.ArrayList;
+import java.util.Vector;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -20,6 +23,7 @@ import javax.swing.SwingUtilities;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,9 +67,9 @@ public class PingGui {
 
 		JTextArea textArea2 = new JTextArea();
 		textArea2.setBackground(SystemColor.control);
-		textArea2.setBounds(760, 69, 214, 143);
+		textArea2.setBounds(750, 69, 224, 167);
 		textArea2.setEditable(false);
-		textArea2.setText("Your output will appear hear");
+		JTextAreaOutputStream out2 = new JTextAreaOutputStream (textArea2);
 		frmPingtest.getContentPane().add(textArea2);
 
 		textField = new JTextField();
@@ -108,21 +112,51 @@ public class PingGui {
 					count++;
 				}
 				/*regex text*/
-				System.setOut(old);
-				System.err.println(a1.toString());
+				// System.err.println(a1.toString());
+				ArrayList<Integer> list = new ArrayList<>();
+				ArrayList<Integer> list_2 = new ArrayList<>();
+				for(int i=1;i<(Prob_num*3-1);i=i+3){
+					list.add(Integer.parseInt(a1.get(i)));
+					list_2.add(Integer.parseInt(a1.get(i)));
+				}
+				// System.err.println(list);
+				Collections.sort(list,Collections.reverseOrder());
+				Collections.sort(list_2,Collections.reverseOrder());
+				double bin_size1 = (list.get(0)-list.get(list.size()-1))/3;
+				if(bin_size1==0){bin_size1=1;}
+				int bin_size = (int)Math.ceil(bin_size1);
+				System.out.println(bin_size);
+				for(int j=0;j<bin_size;j++){
+					int tem_count = 0;
+					for (int i = 0; i < list_2.size(); i++) {
+						if(list_2.get(i)<(list.get(list.size()-1)+3*(j+1))){
+							tem_count++;
+							list_2.remove(i);
+						}
+					}
+					/逻辑错了，有可能碰到中间是空的/
+					System.setOut(new PrintStream(out2));
+					System.out.print((list.get(list.size()-1)+3*j)+"<=RTT<"+(list.get(list.size()-1)+3*(j+1)));
+					for(int l=0;l<tem_count;l++){
+						System.out.print("  *        ");
+					}
+					System.out.println(tem_count);
+					System.out.println();
+					}
+					textArea2.setText("");
 				/* txt text */
-				Date dNow = new Date( );
-      			SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd-hh-mm-ss");
-				File f = new File(UrlString+"-"+ft.format(dNow)+".txt");
-				f.createNewFile();
-				FileOutputStream file1 = new FileOutputStream(f);
-				PrintStream print2 = new PrintStream(file1);
-				System.setOut(print2);
-				System.out.println(UrlString+"-"+ft.format(dNow)+".txt");
-				System.out.println();
-				System.out.println("RTT(ms) histogram"); 
+				// Date dNow = new Date( );
+      			// SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd-hh-mm-ss");
+				// File f = new File(UrlString+"-"+ft.format(dNow)+".txt");
+				// f.createNewFile();
+				// FileOutputStream file1 = new FileOutputStream(f);
+				// PrintStream print2 = new PrintStream(file1);
+				// System.setOut(print2);
+				// System.out.println(UrlString+"-"+ft.format(dNow)+".txt");
+				// System.out.println();
+				// System.out.println("RTT(ms) histogram"); 
 
-				scanner.close();
+				// scanner.close();
 			} catch(IOException E){
 				E.printStackTrace();
 			}
