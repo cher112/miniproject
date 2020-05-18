@@ -3,11 +3,10 @@ import java.awt.Font;
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.JButton;
 
 import java.util.ArrayList;
-import java.util.Vector;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Scanner;
@@ -19,11 +18,11 @@ import java.awt.SystemColor;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,21 +55,35 @@ public class PingGui {
 		frmPingtest.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmPingtest.getContentPane().setLayout(null);
 		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setEnabled(false);
+		scrollPane_1.setBounds(730, 113, 350, 130);
+		scrollPane_1.setBorder(null);
+		frmPingtest.getContentPane().add(scrollPane_1);
+
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setBounds(350, 22, 350, 220);
+		frmPingtest.getContentPane().add(scrollPane);
+
+
 		JTextArea textArea = new JTextArea();
-		textArea.setBounds(368, 10, 372, 241);
+		JScrollPane jsp1 = new JScrollPane(textArea);
+		jsp1.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		textArea.setEditable(false);
 		textArea.setText("Your output will appear hear");
 		JTextAreaOutputStream out = new JTextAreaOutputStream (textArea);
 		PrintStream old = System.out;
 		System.setOut (new PrintStream (out));
-		frmPingtest.getContentPane().add(textArea);
+		scrollPane.setViewportView(textArea);
+
 
 		JTextArea textArea2 = new JTextArea();
 		textArea2.setBackground(SystemColor.control);
-		textArea2.setBounds(750, 69, 224, 167);
 		textArea2.setEditable(false);
 		JTextAreaOutputStream out2 = new JTextAreaOutputStream (textArea2);
-		frmPingtest.getContentPane().add(textArea2);
+		scrollPane_1.setViewportView(textArea2);
 
 		textField = new JTextField();
 		textField.setBounds(114, 72, 214, 19);
@@ -115,48 +128,65 @@ public class PingGui {
 				// System.err.println(a1.toString());
 				ArrayList<Integer> list = new ArrayList<>();
 				ArrayList<Integer> list_2 = new ArrayList<>();
+				ArrayList<Integer> list_hist = new ArrayList<>();
 				for(int i=1;i<(Prob_num*3-1);i=i+3){
 					list.add(Integer.parseInt(a1.get(i)));
 					list_2.add(Integer.parseInt(a1.get(i)));
 				}
 				// System.err.println(list);
+				System.setOut(old);
+				
 				Collections.sort(list,Collections.reverseOrder());
 				Collections.sort(list_2,Collections.reverseOrder());
+				double judge = (list.get(0)-list.get(list.size()-1))%3;
 				double bin_size1 = (list.get(0)-list.get(list.size()-1))/3;
-				if(bin_size1==0){bin_size1=1;}
-				int bin_size = (int)Math.ceil(bin_size1);
+				int bin_size;
+				if(judge!=0){
+					bin_size = ((int)Math.ceil(bin_size1)+1);
+				}else{
+					bin_size = ((int)Math.ceil(bin_size1));
+				}
+				if(bin_size==0){bin_size++;}
 				System.out.println(bin_size);
 				for(int j=0;j<bin_size;j++){
 					int tem_count = 0;
-					for (int i = 0; i < list_2.size(); i++) {
-						if(list_2.get(i)<(list.get(list.size()-1)+3*(j+1))){
+					for (int i = (list_2.size()-1); i >= 0; i--) {
+						if(list_2.get(i) < (list.get(list.size()-1)+3*(j+1)) && list_2.get(i) >= (list.get(list.size()-1)+3*j)){
 							tem_count++;
 							list_2.remove(i);
 						}
 					}
-					/逻辑错了，有可能碰到中间是空的/
 					System.setOut(new PrintStream(out2));
 					System.out.print((list.get(list.size()-1)+3*j)+"<=RTT<"+(list.get(list.size()-1)+3*(j+1)));
+					list_hist.add(tem_count);
+					if(tem_count!=0){
 					for(int l=0;l<tem_count;l++){
 						System.out.print("  *        ");
 					}
-					System.out.println(tem_count);
 					System.out.println();
+				}else{System.out.println();}
 					}
 					textArea2.setText("");
-				/* txt text */
-				// Date dNow = new Date( );
-      			// SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd-hh-mm-ss");
-				// File f = new File(UrlString+"-"+ft.format(dNow)+".txt");
-				// f.createNewFile();
-				// FileOutputStream file1 = new FileOutputStream(f);
-				// PrintStream print2 = new PrintStream(file1);
-				// System.setOut(print2);
-				// System.out.println(UrlString+"-"+ft.format(dNow)+".txt");
-				// System.out.println();
-				// System.out.println("RTT(ms) histogram"); 
+					System.setOut(old);
+					System.out.println(list_hist.toString());
+					/* txt text */
+					Date dNow = new Date( );
+					SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd-hh-mm-ss");
+					UrlString = UrlString.replaceAll("\\.","-");
+					File f = new File(UrlString+"-"+ft.format(dNow)+".txt");
+					f.createNewFile();
+					FileOutputStream file1 = new FileOutputStream(f);
+					PrintStream print2 = new PrintStream(file1);
+					System.setOut(print2);
+					System.out.println(UrlString+"-"+ft.format(dNow)+".txt");
+					System.out.println();
+					System.out.println("RTT(ms) histogram");
+					for(int i = 0;i<bin_size;i++){
+						System.out.print(list.get(list.size()-1)+3*i+"-"+(list.get(list.size()-1)+3*(i+1))+":"+list_hist.get(i));
+						System.out.println();
+					} 
 
-				// scanner.close();
+					scanner.close();
 			} catch(IOException E){
 				E.printStackTrace();
 			}
@@ -185,7 +215,7 @@ public class PingGui {
 
 		JLabel HisLabel = new JLabel("Histogram");
 		HisLabel.setFont(new Font("Arial", Font.BOLD, 12));
-		HisLabel.setBounds(779, 15, 62, 15);
+		HisLabel.setBounds(736, 74, 62, 15);
 		frmPingtest.getContentPane().add(HisLabel);
 
 		frmPingtest.setVisible(true);
