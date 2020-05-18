@@ -1,0 +1,40 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-PingGui<ping_d818fdef>",
+            "request": "launch",
+            "mainClass": "PingGui",
+            "projectName": "ping_d818fdef"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-PingTest<ping_d818fdef>",
+            "request": "launch",
+            "mainClass": "PingTest",
+            "projectName": "ping_d818fdef"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-TextComponentTest",
+            "request": "launch",
+            "mainClass": "TextComponentTest"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-FileChooserTest",
+            "request": "launch",
+            "mainClass": "fileChooser.FileChooserTest"
+        }
+    ]
+}

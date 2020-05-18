@@ -5,12 +5,13 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.Color;
 import java.awt.SystemColor;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -56,7 +57,8 @@ public class PingGui {
 		textArea.setEditable(false);
 		textArea.setText("Your output will appear hear");
 		JTextAreaOutputStream out = new JTextAreaOutputStream (textArea);
-    	System.setOut (new PrintStream (out));
+		PrintStream old = System.out;
+		System.setOut (new PrintStream (out));
 		frmPingtest.getContentPane().add(textArea);
 
 		JTextArea textArea2 = new JTextArea();
@@ -90,10 +92,25 @@ public class PingGui {
 				try{
 					Process process = pb.start();
 					Scanner scanner = new Scanner(process.getInputStream());
+					String regex = "(?<=\\=)\\d+";
+					Pattern p = Pattern.compile(regex);
+					ArrayList<String> a1 = new ArrayList<>();
+					int count = 0;
 				while(scanner.hasNextLine()) {
-					System.out.println(scanner.nextLine());
+					String output = scanner.nextLine();
+					System.out.println(output);
+					if(count<=(Prob_num+1) && count>0){
+						Matcher m = p.matcher(output);
+						while (m.find()) { 
+							a1.add(m.group(0));
+						}
+					}
+					count++;
 				}
-				/* 文件输出测试 */
+				/*regex text*/
+				System.setOut(old);
+				System.err.println(a1.toString());
+				/* txt text */
 				Date dNow = new Date( );
       			SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd-hh-mm-ss");
 				File f = new File(UrlString+"-"+ft.format(dNow)+".txt");
