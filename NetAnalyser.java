@@ -1,10 +1,10 @@
 /*
  * @Author: Zhihao Chen
  * @Date: 2020-05-15 17:22:55
- * @LastEditTime: 2020-05-19 12:21:38
+ * @LastEditTime: 2020-05-19 15:47:19
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
- * @FilePath: \ping\PingGui.java
+ * @FilePath: \ping\NetAnalyser.java
  */ 
 import java.awt.Font;
 
@@ -16,7 +16,6 @@ import javax.swing.JButton;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,14 +28,15 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.text.SimpleDateFormat;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class PingGui {
+public class NetAnalyser {
 
 	private JFrame frmPingtest;
 	private JTextField textField;
@@ -45,10 +45,10 @@ public class PingGui {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) throws IOException {
-		new PingGui();
+		new NetAnalyser();
 } 
 
-	public PingGui() throws IOException {
+	public NetAnalyser() throws IOException {
 		initialize();
 	}
 
@@ -87,7 +87,7 @@ public class PingGui {
 		textArea.setEditable(false);
 		textArea.setText("Your output will appear hear");
 		JTextAreaOutputStream out = new JTextAreaOutputStream (textArea);
-		PrintStream old = System.out;
+		// PrintStream old = System.out;
 		System.setOut (new PrintStream (out));
 		scrollPane.setViewportView(textArea);
 
@@ -152,7 +152,7 @@ public class PingGui {
 				ArrayList<Integer> list_2 = new ArrayList<>();
 				ArrayList<Integer> list_hist = new ArrayList<>();
 				int Prob_num_2 = Prob_num-Probe_fix;
-				System.out.println(Prob_num_2);
+				
 				if(Prob_num_2==1){
 					list.add(Integer.parseInt(a1.get(1)));
 					list_2.add(Integer.parseInt(a1.get(1)));
@@ -162,8 +162,8 @@ public class PingGui {
 					list_2.add(Integer.parseInt(a1.get(i)));
 				}
 			}
-				System.setOut(old);
-				System.out.println(list);
+				// System.setOut(old);
+				// System.out.println(list);
 				Collections.sort(list,Collections.reverseOrder());
 				Collections.sort(list_2,Collections.reverseOrder());
 				double judge = (list.get(0)-list.get(list.size()-1))%3;
@@ -174,6 +174,7 @@ public class PingGui {
 				}else{
 					bin_size = ((int)Math.ceil(bin_size1));
 				}
+				if((list.get(list.size()-1)+3*bin_size)==(list.get(0))){bin_size++;}
 				if(bin_size==0){bin_size++;}
 				// System.out.println(bin_size);
 				for(int j=0;j<bin_size;j++){
@@ -181,26 +182,27 @@ public class PingGui {
 					for (int i = (list_2.size()-1); i >= 0; i--) {
 						if(list_2.get(i) < (list.get(list.size()-1)+3*(j+1)) && list_2.get(i) >= (list.get(list.size()-1)+3*j)){
 							tem_count++;
-							list_2.remove(i);
 						}
 					}
 					System.setOut(new PrintStream(out2));
 					textArea2.setText("");
-					System.out.print((list.get(list.size()-1)+3*j)+"<=RTT<"+(list.get(list.size()-1)+3*(j+1)));
+					System.out.print((list.get(list.size()-1)+3*j)+"<=RTT<"+(list.get(list.size()-1)+3*(j+1))+" ");
 					list_hist.add(tem_count);
+					
 					if(tem_count!=0){
 					for(int l=0;l<tem_count;l++){
-						System.out.print("  *        ");
+						System.out.print("*        ");
 					}
 					System.out.println();
 				}else{System.out.println();}
 					}
+					
+					// System.out.println(list_hist);
 					textArea2.setText("");
-					// System.setOut(old);
-					// System.out.println(list_hist.toString());
+					
 					/* txt text */
-					Date dNow = new Date( );
-					SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd-hh-mm-ss");
+					LocalDateTime dNow = LocalDateTime.now();
+					DateTimeFormatter ft = DateTimeFormatter.ofPattern("yyyy-MM-dd-hh-mm-ss");
 					UrlString = UrlString.replaceAll("\\.","-");
 					File f = new File(UrlString+"-"+ft.format(dNow)+".txt");
 					f.createNewFile();
@@ -211,11 +213,11 @@ public class PingGui {
 					System.out.println();
 					System.out.println("RTT(ms) histogram");
 					for(int i = 0;i<bin_size;i++){
-						System.out.print(list.get(list.size()-1)+3*i+"-"+(list.get(list.size()-1)+3*(i+1))+":"+list_hist.get(i));
-						System.out.println();
-					} 
+					  System.out.print(list.get(list.size()-1)+3*i+"-"+(list.get(list.size()-1)+3*(i+1))+":"+list_hist.get(i));
+					  System.out.println();
+					  } 
 
-					scanner.close();
+					  scanner.close();
 			} catch(IOException E){
 				E.printStackTrace();
 			}
