@@ -1,3 +1,11 @@
+/*
+ * @Author: Zhihao Chen
+ * @Date: 2020-05-15 17:22:55
+ * @LastEditTime: 2020-05-19 12:21:38
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \ping\PingGui.java
+ */ 
 import java.awt.Font;
 
 import javax.swing.JFrame;
@@ -45,11 +53,16 @@ public class PingGui {
 	}
 
 	/**
-	 * Initialize the contents of the frame.
+	 * Initialize the contents of the jframe.
 	 */
 	public void initialize() throws IOException{
 
-		frmPingtest = new JFrame();
+  /**
+   * @description: 
+   * @param {type} 
+   * @return: 
+   */  
+  frmPingtest = new JFrame();
 		frmPingtest.setTitle("NetAnalyser V1.0");
 		frmPingtest.setBounds(100, 100, 1100, 300);
 		frmPingtest.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -110,32 +123,47 @@ public class PingGui {
 					Process process = pb.start();
 					Scanner scanner = new Scanner(process.getInputStream());
 					String regex = "(?<=\\=)\\d+";
+					String reg_err = ".*[\\.¡£]$";
 					Pattern p = Pattern.compile(regex);
+					Pattern p_err = Pattern.compile(reg_err);
 					ArrayList<String> a1 = new ArrayList<>();
 					int count = 0;
+					int Probe_fix=0;
 				while(scanner.hasNextLine()) {
 					String output = scanner.nextLine();
 					System.out.println(output);
+					Matcher m = p.matcher(output);
+					Matcher error = p_err.matcher(output);
+					if(error.find()){
+						Probe_fix++;
+					} else {
 					if(count<=(Prob_num+1) && count>0){
-						Matcher m = p.matcher(output);
+						
 						while (m.find()) { 
 							a1.add(m.group(0));
 						}
 					}
+				}	
 					count++;
-				}
+				
+			}
 				/*regex text*/
-				// System.err.println(a1.toString());
 				ArrayList<Integer> list = new ArrayList<>();
 				ArrayList<Integer> list_2 = new ArrayList<>();
 				ArrayList<Integer> list_hist = new ArrayList<>();
-				for(int i=1;i<(Prob_num*3-1);i=i+3){
+				int Prob_num_2 = Prob_num-Probe_fix;
+				System.out.println(Prob_num_2);
+				if(Prob_num_2==1){
+					list.add(Integer.parseInt(a1.get(1)));
+					list_2.add(Integer.parseInt(a1.get(1)));
+				}else{
+				for(int i=1;i<(Prob_num_2*3-1);i=i+3){
 					list.add(Integer.parseInt(a1.get(i)));
 					list_2.add(Integer.parseInt(a1.get(i)));
 				}
-				// System.err.println(list);
+			}
 				System.setOut(old);
-				
+				System.out.println(list);
 				Collections.sort(list,Collections.reverseOrder());
 				Collections.sort(list_2,Collections.reverseOrder());
 				double judge = (list.get(0)-list.get(list.size()-1))%3;
@@ -147,7 +175,7 @@ public class PingGui {
 					bin_size = ((int)Math.ceil(bin_size1));
 				}
 				if(bin_size==0){bin_size++;}
-				System.out.println(bin_size);
+				// System.out.println(bin_size);
 				for(int j=0;j<bin_size;j++){
 					int tem_count = 0;
 					for (int i = (list_2.size()-1); i >= 0; i--) {
@@ -157,6 +185,7 @@ public class PingGui {
 						}
 					}
 					System.setOut(new PrintStream(out2));
+					textArea2.setText("");
 					System.out.print((list.get(list.size()-1)+3*j)+"<=RTT<"+(list.get(list.size()-1)+3*(j+1)));
 					list_hist.add(tem_count);
 					if(tem_count!=0){
@@ -167,8 +196,8 @@ public class PingGui {
 				}else{System.out.println();}
 					}
 					textArea2.setText("");
-					System.setOut(old);
-					System.out.println(list_hist.toString());
+					// System.setOut(old);
+					// System.out.println(list_hist.toString());
 					/* txt text */
 					Date dNow = new Date( );
 					SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd-hh-mm-ss");
