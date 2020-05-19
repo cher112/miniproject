@@ -1,7 +1,7 @@
 /*
  * @Author: Zhihao Chen
  * @Date: 2020-05-15 17:22:55
- * @LastEditTime: 2020-05-19 20:57:19
+ * @LastEditTime: 2020-05-19 22:08:56
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \ping\NetAnalyser.java
@@ -44,18 +44,29 @@ public class NetAnalyser {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) throws IOException {
-		new NetAnalyser();
+	public static void main(String arg[]) throws IOException {
+		int set_Probe = Integer.parseInt(arg[0]);
+		new NetAnalyser(set_Probe);
 } 
 
-	public NetAnalyser() throws IOException {
-		initialize();
+	public NetAnalyser(int a) throws IOException {
+		initialize(a);
 	}
 
 	/**
 	 * Initialize the contents of the jframe.
 	 */
-	public void initialize() throws IOException{
+	public void initialize(int a) throws IOException{
+
+		
+		if(a>20){
+			System.out.println("The probes_num you set is too big(>20), we set that to default_max 20");
+			a=20;
+		}else if(a<0)
+		{
+			System.out.println("The probes_num you set is too small(>20), we set that to default_min 10");
+			a=10;
+		}else{}
 
   /**
    * @description: 
@@ -87,7 +98,7 @@ public class NetAnalyser {
 		textArea.setEditable(false);
 		textArea.setText("Your output will appear hear");
 		JTextAreaOutputStream out = new JTextAreaOutputStream (textArea);
-		// PrintStream old = System.out;
+		PrintStream old = System.out;
 		System.setOut (new PrintStream (out));
 		scrollPane.setViewportView(textArea);
 
@@ -106,7 +117,7 @@ public class NetAnalyser {
 
 
 		JSpinner Probespinner = new JSpinner();
-		Probespinner.setModel(new SpinnerNumberModel(1, 1, 10, 1));
+		Probespinner.setModel(new SpinnerNumberModel(1, 1, a, 1));
 		Probespinner.setBounds(200, 120, 30, 22);
 		frmPingtest.getContentPane().add(Probespinner);
 		
@@ -123,7 +134,7 @@ public class NetAnalyser {
 					Process process = pb.start();
 					Scanner scanner = new Scanner(process.getInputStream());
 					String regex = "(?<=\\=)\\d+";
-					String reg_err = ".*[\\.ã€‚]$";
+					String reg_err = ".*[\\.¡£]$";
 					Pattern p = Pattern.compile(regex);
 					Pattern p_err = Pattern.compile(reg_err);
 					ArrayList<String> a1 = new ArrayList<>();
@@ -162,8 +173,10 @@ public class NetAnalyser {
 					list_2.add(Integer.parseInt(a1.get(i)));
 				}
 			}
-				// System.setOut(old);
-				// System.out.println(list);
+				System.out.println(list);
+				if(list.size()==0){
+					System.out.println("empty in bins,try it again.");
+				}else{
 				Collections.sort(list,Collections.reverseOrder());
 				Collections.sort(list_2,Collections.reverseOrder());
 				double judge = (list.get(0)-list.get(list.size()-1))%3;
@@ -176,6 +189,8 @@ public class NetAnalyser {
 				}
 				if((list.get(list.size()-1)+3*bin_size)==(list.get(0))){bin_size++;}
 				if(bin_size==0){bin_size++;}
+				int range;
+				if(list.size()<=10){ range = 3;}else{range=5;}
 				// System.out.println(bin_size);
 				for(int j=0;j<bin_size;j++){
 					int tem_count = 0;
@@ -218,6 +233,7 @@ public class NetAnalyser {
 					  } 
 
 					  scanner.close();
+					}
 			} catch(IOException E){
 				E.printStackTrace();
 			}

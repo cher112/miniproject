@@ -1,7 +1,7 @@
 /*
  * @Author: Zhihao Chen
  * @Date: 2020-05-15 17:22:55
- * @LastEditTime: 2020-05-19 20:57:19
+ * @LastEditTime: 2020-05-19 21:52:54
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \ping\NetAnalyser.java
@@ -123,7 +123,7 @@ public class NetAnalyser {
 					Process process = pb.start();
 					Scanner scanner = new Scanner(process.getInputStream());
 					String regex = "(?<=\\=)\\d+";
-					String reg_err = ".*[\\.ã€‚]$";
+					String reg_err = ".*[\\.¡£]$";
 					Pattern p = Pattern.compile(regex);
 					Pattern p_err = Pattern.compile(reg_err);
 					ArrayList<String> a1 = new ArrayList<>();
@@ -164,29 +164,32 @@ public class NetAnalyser {
 			}
 				// System.setOut(old);
 				// System.out.println(list);
+				if(list.size()==0){
+					System.out.println("empty in bins,try it again.");
+				}else{
 				Collections.sort(list,Collections.reverseOrder());
 				Collections.sort(list_2,Collections.reverseOrder());
 				double judge = (list.get(0)-list.get(list.size()-1))%3;
 				double bin_size1 = (list.get(0)-list.get(list.size()-1))/3;
 				int bin_size;
 				if(judge!=0){
-					bin_size = ((int)Math.ceil(bin_size1)+1);
+					bin_size = ((int)Math.ceil(bin_size1));
 				}else{
 					bin_size = ((int)Math.ceil(bin_size1));
 				}
-				if((list.get(list.size()-1)+3*bin_size)==(list.get(0))){bin_size++;}
+				//if((list.get(list.size()-1)+3*bin_size)==(list.get(0))){bin_size++;}
 				if(bin_size==0){bin_size++;}
 				// System.out.println(bin_size);
-				for(int j=0;j<bin_size;j++){
+				for(int j=0;j<3;j++){
 					int tem_count = 0;
 					for (int i = (list_2.size()-1); i >= 0; i--) {
-						if(list_2.get(i) < (list.get(list.size()-1)+3*(j+1)) && list_2.get(i) >= (list.get(list.size()-1)+3*j)){
+						if(list_2.get(i) < (list.get(list.size()-1)+(j+1)*(bin_size)) && list_2.get(i) >= (list.get(list.size()-1)+j*(bin_size))){
 							tem_count++;
 						}
 					}
 					System.setOut(new PrintStream(out2));
 					textArea2.setText("");
-					System.out.print((list.get(list.size()-1)+3*j)+"<=RTT<"+(list.get(list.size()-1)+3*(j+1))+" ");
+					System.out.print((list.get(list.size()-1)+j*(bin_size))+"<=RTT<"+(list.get(list.size()-1)+(j+1)*(bin_size))+" ");
 					list_hist.add(tem_count);
 					
 					if(tem_count!=0){
@@ -212,12 +215,13 @@ public class NetAnalyser {
 					System.out.println(UrlString+"-"+ft.format(dNow)+".txt");
 					System.out.println();
 					System.out.println("RTT(ms) histogram");
-					for(int i = 0;i<bin_size;i++){
+					for(int i = 0;i<3;i++){
 					  System.out.print(list.get(list.size()-1)+3*i+"-"+(list.get(list.size()-1)+3*(i+1))+":"+list_hist.get(i));
 					  System.out.println();
 					  } 
 
 					  scanner.close();
+					}
 			} catch(IOException E){
 				E.printStackTrace();
 			}
