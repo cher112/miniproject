@@ -1,8 +1,8 @@
 /*
  * @Author: Zhihao Chen
  * @Date: 2020-05-15 17:22:55
- * @LastEditTime: 2020-05-19 22:08:56
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-05-21 01:20:07
+ * @LastEditors: sueRimn
  * @Description: In User Settings Edit
  * @FilePath: \ping\NetAnalyser.java
  */ 
@@ -53,9 +53,22 @@ public class NetAnalyser {
 		initialize(a);
 	}
 
-	/**
-	 * Initialize the contents of the jframe.
-	 */
+ /**
+  * This i s a method of initialize the NetAnalyser.
+  * Using the JFrame and add TextArea which is for showing the
+  *output of"Ping -n +URL", TextField Jspinner for set the URL and Probe_Num.
+  * Build the action for Process-bottom.Frist, set the output stream to TextArea,clean all remain text by setText()
+  * Read the value from textField and Probespinner,get the URL and Probes number
+  * use regular expression to match both the right output like "Reply from IP bytes
+  * =32 times = 17 TTL = 243" and ignore the "Time out" by match the reg_err(extra credit)
+  * set all numbers next to "times=" in  from second line  to 1+Probesnumere line.
+  * if the output has "Time out", fixed the Probe_num by minus the Probe_fix.
+  * Finally use if and for to write histgram.
+  * @name: initialize
+  * @Descripttion: Initialize the contents of the jframe.
+  * @param null 
+  * @return: null
+  */ 
 	public void initialize(int a) throws IOException{
 
 		
@@ -172,8 +185,9 @@ public class NetAnalyser {
 					list.add(Integer.parseInt(a1.get(i)));
 					list_2.add(Integer.parseInt(a1.get(i)));
 				}
-			}
+				
 				System.out.println(list);
+			}
 				if(list.size()==0){
 					System.out.println("empty in bins,try it again.");
 				}else{
@@ -183,25 +197,22 @@ public class NetAnalyser {
 				double bin_size1 = (list.get(0)-list.get(list.size()-1))/3;
 				int bin_size;
 				if(judge!=0){
-					bin_size = ((int)Math.ceil(bin_size1)+1);
+					bin_size = ((int)Math.ceil(bin_size1));
 				}else{
 					bin_size = ((int)Math.ceil(bin_size1));
 				}
-				if((list.get(list.size()-1)+3*bin_size)==(list.get(0))){bin_size++;}
 				if(bin_size==0){bin_size++;}
-				int range;
-				if(list.size()<=10){ range = 3;}else{range=5;}
-				// System.out.println(bin_size);
-				for(int j=0;j<bin_size;j++){
+				if(list.get(0)>=(list.get(list.size()-1)+3*(bin_size))){bin_size++;}
+				for(int j=0;j<3;j++){
 					int tem_count = 0;
 					for (int i = (list_2.size()-1); i >= 0; i--) {
-						if(list_2.get(i) < (list.get(list.size()-1)+3*(j+1)) && list_2.get(i) >= (list.get(list.size()-1)+3*j)){
+						if(list_2.get(i) < (list.get(list.size()-1)+(j+1)*(bin_size)) && list_2.get(i) >= (list.get(list.size()-1)+j*(bin_size))){
 							tem_count++;
 						}
 					}
 					System.setOut(new PrintStream(out2));
-					textArea2.setText("");
-					System.out.print((list.get(list.size()-1)+3*j)+"<=RTT<"+(list.get(list.size()-1)+3*(j+1))+" ");
+
+					System.out.print((list.get(list.size()-1)+j*(bin_size))+"<=RTT<"+(list.get(list.size()-1)+(j+1)*(bin_size))+" ");
 					list_hist.add(tem_count);
 					
 					if(tem_count!=0){
@@ -212,7 +223,6 @@ public class NetAnalyser {
 				}else{System.out.println();}
 					}
 					
-					// System.out.println(list_hist);
 					textArea2.setText("");
 					
 					/* txt text */

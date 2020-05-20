@@ -1,9 +1,9 @@
 /*
  * @Author: Zhihao Chen
  * @Date: 2020-05-15 17:22:55
- * @LastEditTime: 2020-05-19 21:52:54
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
+ * @LastEditTime: 2020-05-21 01:16:01
+ * @LastEditors: sueRimn
+ * @Description: Task 1 code
  * @FilePath: \ping\NetAnalyser.java
  */ 
 import java.awt.Font;
@@ -36,6 +36,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+	/**
+	 * Build a class called NetAnalyer.
+	 * 
+	 */
 public class NetAnalyser {
 
 	private JFrame frmPingtest;
@@ -49,25 +53,43 @@ public class NetAnalyser {
 } 
 
 	public NetAnalyser() throws IOException {
+
 		initialize();
 	}
 
-	/**
-	 * Initialize the contents of the jframe.
-	 */
+
+ /**
+  * This i s a method of initialize the NetAnalyser.
+  * Using the JFrame and add TextArea which is for showing the
+  *output of"Ping -n +URL", TextField Jspinner for set the URL and Probe_Num.
+  * Build the action for Process-bottom.Frist, set the output stream to TextArea,clean all remain text by setText()
+  * Read the value from textField and Probespinner,get the URL and Probes number
+  * use regular expression to match both the right output like "Reply from IP bytes
+  * =32 times = 17 TTL = 243" and ignore the "Time out" by match the reg_err(extra credit)
+  * set all numbers next to "times=" in  from second line  to 1+Probesnumere line.
+  * if the output has "Time out", fixed the Probe_num by minus the Probe_fix.
+  * Finally use if and for to write histgram.
+  * @name: initialize
+  * @Descripttion: Initialize the contents of the jframe.
+  * @param null 
+  * @return: null
+  */ 
+
 	public void initialize() throws IOException{
 
-  /**
-   * @description: 
-   * @param {type} 
-   * @return: 
-   */  
   frmPingtest = new JFrame();
+  	/**
+	 * Set the basic info of frmPingtest like title,bound and layout.
+	 * 
+	 */
 		frmPingtest.setTitle("NetAnalyser V1.0");
 		frmPingtest.setBounds(100, 100, 1100, 300);
 		frmPingtest.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmPingtest.getContentPane().setLayout(null);
-		
+	/**
+	 * Set the basic info of scrollPane for two TextArea.
+	 * 
+	 */
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setEnabled(false);
 		scrollPane_1.setBounds(730, 113, 350, 130);
@@ -80,7 +102,11 @@ public class NetAnalyser {
 		scrollPane.setBounds(350, 22, 350, 220);
 		frmPingtest.getContentPane().add(scrollPane);
 
-
+/**
+	 * Set the basic info fpr two Jtextareas. First is for the output of powershell
+	 * second is for histgram.
+	 * 
+	 */
 		JTextArea textArea = new JTextArea();
 		JScrollPane jsp1 = new JScrollPane(textArea);
 		jsp1.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -97,7 +123,10 @@ public class NetAnalyser {
 		textArea2.setEditable(false);
 		JTextAreaOutputStream out2 = new JTextAreaOutputStream (textArea2);
 		scrollPane_1.setViewportView(textArea2);
-
+/**
+	 * Set the basic info of JTextField and Jspinner, for set the value of URL and Probe_number.
+	 * 
+	 */
 		textField = new JTextField();
 		textField.setBounds(114, 72, 214, 19);
 		frmPingtest.getContentPane().add(textField);
@@ -110,11 +139,23 @@ public class NetAnalyser {
 		Probespinner.setBounds(200, 120, 30, 22);
 		frmPingtest.getContentPane().add(Probespinner);
 		
+/**
+	 * Build the action for Process-bottom.
+	 * Frist, set the output stream to TextArea,clean all remain text by setText()
+	 * Read the value from textField and Probespinner,get the URL and Probes number
+	 * use regular expression to match both the right output like "Reply from IP bytes
+	 * =32 times = 17 TTL = 243" and ignore the "Time out" by match the reg_err(extra credit)
+	 * set all numbers next to "times=" in  from second line  to 1+Probesnumere line.
+	 * if the output has "Time out", fixed the Probe_num by minus the Probe_fix.
+	 * Finally use if and for to write histgram.
+	 * 
+	 */
 		JButton btnProcess = new JButton("Process");
 		btnProcess.setFont(new Font("Arial", Font.BOLD, 12));
 		btnProcess.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				textArea.setText("");
+				textArea2.setText("");
 				System.setOut(new PrintStream (out));
 				String UrlString = textField.getText();
 				int Prob_num = (int)Probespinner.getValue();
@@ -161,9 +202,9 @@ public class NetAnalyser {
 					list.add(Integer.parseInt(a1.get(i)));
 					list_2.add(Integer.parseInt(a1.get(i)));
 				}
+				
+				System.out.println(list);
 			}
-				// System.setOut(old);
-				// System.out.println(list);
 				if(list.size()==0){
 					System.out.println("empty in bins,try it again.");
 				}else{
@@ -177,9 +218,8 @@ public class NetAnalyser {
 				}else{
 					bin_size = ((int)Math.ceil(bin_size1));
 				}
-				//if((list.get(list.size()-1)+3*bin_size)==(list.get(0))){bin_size++;}
 				if(bin_size==0){bin_size++;}
-				// System.out.println(bin_size);
+				if(list.get(0)>=(list.get(list.size()-1)+3*(bin_size))){bin_size++;}
 				for(int j=0;j<3;j++){
 					int tem_count = 0;
 					for (int i = (list_2.size()-1); i >= 0; i--) {
@@ -188,7 +228,7 @@ public class NetAnalyser {
 						}
 					}
 					System.setOut(new PrintStream(out2));
-					textArea2.setText("");
+
 					System.out.print((list.get(list.size()-1)+j*(bin_size))+"<=RTT<"+(list.get(list.size()-1)+(j+1)*(bin_size))+" ");
 					list_hist.add(tem_count);
 					
@@ -200,27 +240,8 @@ public class NetAnalyser {
 				}else{System.out.println();}
 					}
 					
-					// System.out.println(list_hist);
 					textArea2.setText("");
 					
-					/* txt text */
-					LocalDateTime dNow = LocalDateTime.now();
-					DateTimeFormatter ft = DateTimeFormatter.ofPattern("yyyy-MM-dd-hh-mm-ss");
-					UrlString = UrlString.replaceAll("\\.","-");
-					File f = new File(UrlString+"-"+ft.format(dNow)+".txt");
-					f.createNewFile();
-					FileOutputStream file1 = new FileOutputStream(f);
-					PrintStream print2 = new PrintStream(file1);
-					System.setOut(print2);
-					System.out.println(UrlString+"-"+ft.format(dNow)+".txt");
-					System.out.println();
-					System.out.println("RTT(ms) histogram");
-					for(int i = 0;i<3;i++){
-					  System.out.print(list.get(list.size()-1)+3*i+"-"+(list.get(list.size()-1)+3*(i+1))+":"+list_hist.get(i));
-					  System.out.println();
-					  } 
-
-					  scanner.close();
 					}
 			} catch(IOException E){
 				E.printStackTrace();
@@ -228,7 +249,9 @@ public class NetAnalyser {
 		}
 		}
 		);
-		
+		/**
+   * set some basic information of labels, like title and Font.
+   */
 		btnProcess.setBounds(137, 192, 93, 23);
 		frmPingtest.getContentPane().add(btnProcess);
 		
@@ -258,8 +281,12 @@ public class NetAnalyser {
 	}
 }
 
+
 class JTextAreaOutputStream extends OutputStream
 {
+	/**
+	 * extends the OutputStream for better JTextArea output stream, write the new IOexception"Destination is null".
+     */
     private final JTextArea destination;
  
  
